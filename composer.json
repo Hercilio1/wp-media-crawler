@@ -52,5 +52,8 @@
 			"wp dist-archive .",
 			"composer install"
 		]
+	},
+	"require": {
+		"symfony/dom-crawler": "^5.4"
 	}
 }
