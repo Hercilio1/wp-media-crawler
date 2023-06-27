@@ -31,10 +31,10 @@
 		"wp-media/phpunit": "^3"
 	},
 	"autoload": {
-        "psr-4": {
-            "WP_Media\\Crawler\\": "src/"
-        }
-    },
+		"psr-4": {
+			"WP_Media\\Crawler\\": "src/"
+		}
+	},
 	"autoload-dev": {},
 	"scripts": {
 		"test-unit": "\"vendor/bin/wpmedia-phpunit\" unit path=Tests/Unit",
