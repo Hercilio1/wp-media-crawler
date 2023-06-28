@@ -7,7 +7,7 @@
 
 namespace WP_Media\Crawler;
 
-use \Symfony\Component\DomCrawler\Crawler as SymfonyCrawler;
+use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
 
 /**
  * Class Init. Initializes the plugin and the sequential main flow.
@@ -19,20 +19,9 @@ class Init {
 	 */
 	public static function init() {
 		if ( isset( $_GET['wp_media'] ) && 'test' === $_GET['wp_media'] ) {
-			$response = wp_remote_get( home_url() );
-
-			$html = $response['body'];
-
-			$crawler = new SymfonyCrawler( $html );
-
+			$links = ( new LinksCrawler( home_url() ) )->crawl();
 			echo '<pre>';
-			print_r(
-				$crawler->filterXPath( '//a/@href' )->each(
-					function ( SymfonyCrawler $node, $i ) {
-						return $node->text();
-					}
-				)
-			);
+			print_r( $links );
 			exit;
 		}
 	}
