@@ -3,6 +3,10 @@
  * Implemented by Hercilio M. Ortiz (https://github.com/Hercilio1).
  *
  * @package WP_Media_Crawler
+ *
+ * @phpcs:disable Squiz.Commenting.FunctionComment
+ * @phpcs:disable Generic.Commenting.DocComment
+ * @phpcs:disable WordPress.WP.AlternativeFunctions
  */
 
 namespace WP_Media\Crawler\Tests\Unit\Custom\Crawlers;
@@ -13,35 +17,170 @@ use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Crawlers\LinksCrawler
+ * @covers \WP_Media\Crawler\Custom\Crawlers\AbstractCrawler
  * @group Crawlers
  */
 final class LinksCrawlerTest extends TestCase {
 
-	public function setUp(): void {
+	protected function setUp() : void {
 		parent::setUp();
 		\Brain\Monkey\setUp();
 	}
 
-	public function test_crawl_well_formed_links() {
+	public function test_crawl_well_formed_links() : void {
 		$mock_url = 'http://example.com';
 
+		$this->mock_default_procedural_functions(
+			$mock_url,
+			<<<'HTML'
+			<!DOCTYPE html>
+			<html>
+				<body>
+					<a href="http://example.com/link-1">Link 1</a>
+					<a href="http://example.com/link-2">Link 2</a>
+				</body>
+			</html>
+			HTML
+		);
+
+		$crawler = new LinksCrawler( $mock_url );
+		$result  = $crawler->crawl();
+
+		$expected_result = [
+			[
+				'title' => 'Link 1',
+				'href'  => 'http://example.com/link-1',
+			],
+			[
+				'title' => 'Link 2',
+				'href'  => 'http://example.com/link-2',
+			],
+		];
+		$this->assertEquals( $expected_result, $result );
+	}
+
+	public function test_crawl_with_links_without_title() : void {
+		$mock_url = 'http://example.com';
+
+		$this->mock_default_procedural_functions(
+			$mock_url,
+			<<<'HTML'
+			<!DOCTYPE html>
+			<html>
+				<body>
+					<a href="http://example.com/link-1"><img src="http://example.com/img-1" /></a>
+					<a href="http://example.com/link-2">Link 2</a>
+				</body>
+			</html>
+			HTML
+		);
+
+		$crawler = new LinksCrawler( $mock_url );
+		$result  = $crawler->crawl();
+
+		$expected_result = [
+			[
+				'title' => 'Link 2',
+				'href'  => 'http://example.com/link-2',
+			],
+		];
+		$this->assertEquals( $expected_result, $result );
+	}
+
+	public function test_crawl_with_links_with_title_as_attribute() : void {
+		$mock_url = 'http://example.com';
+
+		$this->mock_default_procedural_functions(
+			$mock_url,
+			<<<'HTML'
+			<!DOCTYPE html>
+			<html>
+				<body>
+					<a href="http://example.com/link-1" title="Link 1"><img src="http://example.com/img-1" /></a>
+					<a href="http://example.com/link-2">Link 2</a>
+				</body>
+			</html>
+			HTML
+		);
+
+		$crawler = new LinksCrawler( $mock_url );
+		$result  = $crawler->crawl();
+
+		$expected_result = [
+			[
+				'title' => 'Link 1',
+				'href'  => 'http://example.com/link-1',
+			],
+			[
+				'title' => 'Link 2',
+				'href'  => 'http://example.com/link-2',
+			],
+		];
+		$this->assertEquals( $expected_result, $result );
+	}
+
+	public function test_crawl_without_links() : void {
+		$mock_url = 'http://example.com';
+
+		$this->mock_default_procedural_functions(
+			$mock_url,
+			<<<'HTML'
+			<!DOCTYPE html>
+			<html>
+				<body>
+					<p>Not a link 1</p>
+					<span>Not a link 2</span>
+				</body>
+			</html>
+			HTML
+		);
+
+		$crawler = new LinksCrawler( $mock_url );
+		$result  = $crawler->crawl();
+
+		$this->assertIsArray( $result );
+		$this->assertEmpty( $result );
+	}
+
+	public function test_crawl_with_external_links() : void {
+		$mock_url = 'http://example.com';
+
+		$this->mock_default_procedural_functions(
+			$mock_url,
+			<<<'HTML'
+			<!DOCTYPE html>
+			<html>
+				<body>
+					<a href="http://example.com.eu/link-1">Link 1</a>
+					<a href="http://example.com/link-2">Link 2</a>
+				</body>
+			</html>
+			HTML
+		);
+
+		$crawler = new LinksCrawler( $mock_url );
+		$result  = $crawler->crawl();
+
+		$expected_result = [
+			[
+				'title' => 'Link 2',
+				'href'  => 'http://example.com/link-2',
+			],
+		];
+		$this->assertEquals( $expected_result, $result );
+	}
+
+	private function mock_default_procedural_functions( $mock_url, $response_body ) : void {
 		Functions\expect( 'wp_remote_get' )
 			->once()
-			->with($mock_url)
-			->andReturn(array(
-				'body' => <<<'HTML'
-				<!DOCTYPE html>
-				<html>
-					<body>
-						<a href="http://example.com/link-1">Link 1</a>
-						<a href="http://example.com/link-2">Link 2</a>
-					</body>
-				</html>
-				HTML
-			));
+			->with( $mock_url )
+			->andReturn(
+				[
+					'body' => $response_body,
+				]
+			);
 
 		Functions\expect( 'wp_parse_url' )
-			->twice()
 			->andReturnUsing(
 				function( $url ) {
 					return parse_url( $url, PHP_URL_HOST );
@@ -49,26 +188,10 @@ final class LinksCrawlerTest extends TestCase {
 			);
 
 		Functions\expect( 'get_site_url' )
-			->twice()
 			->andReturn( $mock_url );
-
-		$crawler = new LinksCrawler( $mock_url );
-		$result = $crawler->crawl();
-
-		$expected_result = array(
-			array(
-				'title' => 'Link 1',
-				'href'  => 'http://example.com/link-1',
-			),
-			array(
-				'title' => 'Link 2',
-				'href'  => 'http://example.com/link-2',
-			),
-		);
-		$this->assertEquals( $expected_result, $result );
 	}
 
-	public function tearDown(): void {
+	public function tearDown() : void {
 		\Brain\Monkey\tearDown();
 		parent::tearDown();
 	}

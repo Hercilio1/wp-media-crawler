@@ -7,6 +7,8 @@
 
 namespace WP_Media\Crawler\Custom\Crawlers;
 
+use Exception;
+
 /**
  * Class AbstractCrawler. Abstraction of any crawler.
  */
@@ -30,21 +32,27 @@ abstract class AbstractCrawler {
 
 	/**
 	 * Abstract method 'crawl'. All crawlers should crawl.
+	 *
+	 * @return array The crawled data.
 	 */
-	abstract public function crawl();
+	abstract public function crawl() : array;
 
 	/**
 	 * Get the web page content
 	 *
 	 * @return string The web page content.
+	 *
+	 * @throws Exception If the page request returns an error.
+	 * @throws Exception If the response body is empty.
 	 */
-	protected function get_the_webpage_content() {
+	public function get_the_webpage_content() : string {
 		$response = wp_remote_get( $this->url );
+
 		if ( is_wp_error( $response ) ) {
-			return ''; // TODO: Add exception handling.
+			throw new Exception( __( 'Error while downloading the home page HTML.', 'wp-media-crawler' ) );
 		}
 		if ( ! isset( $response['body'] ) || empty( $response['body'] ) ) {
-			return ''; // TODO: Add exception handling.
+			throw new Exception( __( 'The homepage HTML is improperly formatted.', 'wp-media-crawler' ) );
 		}
 		return $response['body'];
 	}

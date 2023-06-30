@@ -12,7 +12,7 @@ use \Symfony\Component\DomCrawler\Crawler;
 /**
  * Class LinksCrawler. Crawls the links of a Web page.
  */
-class LinksCrawler extends AbstractCrawler {
+final class LinksCrawler extends AbstractCrawler {
 
 	/**
 	 * The links list
@@ -22,11 +22,18 @@ class LinksCrawler extends AbstractCrawler {
 	private $links = [];
 
 	/**
+	 * Internal domain.
+	 *
+	 * @var string $internal_domain
+	 */
+	private $internal_domain;
+
+	/**
 	 * Crawls the links of a Webpage.
 	 *
 	 * @return array The links found.
 	 */
-	public function crawl() {
+	public function crawl() : array {
 		$html = $this->get_the_webpage_content();
 		if ( $html ) {
 			$crawler = new Crawler( $html );
@@ -44,10 +51,14 @@ class LinksCrawler extends AbstractCrawler {
 	 *
 	 * @param Crawler $node - The link DOM node.
 	 */
-	private function add_link( Crawler $node ) {
+	private function add_link( $node ) : void {
 		$title = $node->text();
-		$href  = $node->attr( 'href' );
-		if ( ! empty( $title ) && $this->is_internal_link( $href ) ) {
+		$title = $title ? $title : $node->attr( 'title' );
+		if ( empty( $title ) ) {
+			return;
+		}
+		$href = $node->attr( 'href' );
+		if ( $this->is_internal_link( $href ) ) {
 			$this->links[] = [
 				'title' => $title,
 				'href'  => $href,
@@ -62,8 +73,31 @@ class LinksCrawler extends AbstractCrawler {
 	 *
 	 * @return bool - True if the link is internal, false otherwise.
 	 */
-	private function is_internal_link( $link ) {
-		$internal_domain = wp_parse_url( get_site_url(), PHP_URL_HOST );
-		return strpos( $link, $internal_domain ) !== false;
+	private function is_internal_link( $link ) : bool {
+		$internal_domain = $this->get_internal_domain();
+		return $internal_domain === $this->get_domain( $link );
+	}
+
+	/**
+	 * Returns the internal domain.
+	 *
+	 * @return string - The internal domain.
+	 */
+	private function get_internal_domain() : string {
+		if ( ! $this->internal_domain ) {
+			$this->internal_domain = $this->get_domain( get_site_url() );
+		}
+		return $this->internal_domain;
+	}
+
+	/**
+	 * Returns the domain of an url.
+	 *
+	 * @param string $url - The url.
+	 *
+	 * @return string - The domain of the url.
+	 */
+	private function get_domain( $url ) : string {
+		return wp_parse_url( $url, PHP_URL_HOST );
 	}
 }
