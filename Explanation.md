@@ -4,6 +4,10 @@
 
 After searching for the best solutions for crawling links using PHP/WordPress, I chose to use the [Symfony Crawler](https://github.com/symfony/dom-crawler). This libs is by far the most popular one and it is very straightforward. I also could use the native PHP DomDocument class to crawl, but I have some experience with this guy and if I can avoid handling its limitations and weirdness, I go for it. 
 
+## Where to save the sitemap.html
+
+First I thought about saving the sitemap.html file in the WP root through the ABSPATH constant. But I felt like there were better approaches than this. So I decided to look at some solutions made by some big guys. I used Yoast as a reference, storing the sitemap.html in a safer place, the wp-content/uploads folder, and serving it through PHP using rewrite rules (as Yoast does with the sitemap.xml).
+
 ## Package template changes
 
 I needed to adjust some settings of your package template. I mainly changed the composer.json, because some of the libs weren't being found. I did some general changes as well, so I would be able to feel a little bit more comfortable. The changes were the first thing I did and you can follow the main ones here in this commit: https://github.com/Hercilio1/wp-media-crawler/commit/998289dd

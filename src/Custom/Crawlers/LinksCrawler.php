@@ -8,6 +8,7 @@
 namespace WP_Media\Crawler\Custom\Crawlers;
 
 use \Symfony\Component\DomCrawler\Crawler;
+use WP_Media\Crawler\Schemas\Link;
 
 /**
  * Class LinksCrawler. Crawls the links of a Web page.
@@ -17,7 +18,7 @@ final class LinksCrawler extends AbstractCrawler {
 	/**
 	 * The links list
 	 *
-	 * @var array $links
+	 * @var Link[] $links
 	 */
 	private $links = [];
 
@@ -59,10 +60,7 @@ final class LinksCrawler extends AbstractCrawler {
 		}
 		$href = $node->attr( 'href' );
 		if ( $this->is_internal_link( $href ) ) {
-			$this->links[] = [
-				'title' => $title,
-				'href'  => $href,
-			];
+			$this->links[] = new Link( $title, $href );
 		}
 	}
 
@@ -75,6 +73,11 @@ final class LinksCrawler extends AbstractCrawler {
 	 */
 	private function is_internal_link( $link ) : bool {
 		$internal_domain = $this->get_internal_domain();
+		$domain          = $this->get_domain( $link );
+		// If the domain is empty, it is an internal link.
+		if ( ! $domain ) {
+			return true;
+		}
 		return $internal_domain === $this->get_domain( $link );
 	}
 
@@ -98,6 +101,10 @@ final class LinksCrawler extends AbstractCrawler {
 	 * @return string - The domain of the url.
 	 */
 	private function get_domain( $url ) : string {
-		return wp_parse_url( $url, PHP_URL_HOST );
+		$domain = wp_parse_url( $url, PHP_URL_HOST );
+		if ( ! $domain ) {
+			return '';
+		}
+		return $domain;
 	}
 }

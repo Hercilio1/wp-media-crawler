@@ -50,10 +50,10 @@ final class AbstractCrawlerTest extends TestCase {
 
 	public function test_response_body_exception() : void {
 		$mock_url  = 'http://example.com';
-		$error_msg = 'Error while downloading the home page HTML.';
+		$error_msg = 'The homepage HTML is improperly formatted.';
 
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessage( 'The homepage HTML is improperly formatted.' );
+		$this->expectExceptionMessage( $error_msg );
 
 		Mockery::mock( 'overload:WP_Error' );
 
@@ -69,7 +69,7 @@ final class AbstractCrawlerTest extends TestCase {
 		$crawler->crawl();
 	}
 
-	public function tearDown() : void {
+	protected function tearDown() : void {
 		\Brain\Monkey\tearDown();
 		parent::tearDown();
 	}
