@@ -25,7 +25,7 @@ final class SitemapRouter {
 	/**
 	 * Sets up rewrite rules.
 	 */
-	public function add_rewrite_rule() {
+	public function add_rewrite_rule() : void {
 		global $wp;
 
 		$wp->add_query_var( 'wp_media_sitemap' );
@@ -38,8 +38,7 @@ final class SitemapRouter {
 	 *
 	 * @param \WP_Query $query The WP_Query instance.
 	 */
-	public function redirect( $query ) {
-		global $wp_rewrite;
+	public function redirect( $query ) : void {
 		if ( ! $query->is_main_query() ) {
 			return;
 		}

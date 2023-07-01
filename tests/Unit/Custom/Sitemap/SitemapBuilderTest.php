@@ -32,7 +32,6 @@ final class LinksCrawlerTest extends TestCase {
 	}
 
 	public function test_build_links() : void {
-
 		$links = [
 			new Link( 'Link 1', 'http://example.com/link-1' ),
 			new Link( 'Link 2', 'http://example.com/link-2' ),
