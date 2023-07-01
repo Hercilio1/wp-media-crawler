@@ -7,23 +7,55 @@
 
 namespace WP_Media\Crawler\Custom\Sitemap;
 
+use WP_Filesystem_Direct;
+
 /**
  * Class SitemapFile. Manages the sitemap.html file.
  */
 final class SitemapFile {
 
 	/**
+	 * Instance of the filesystem handler.
+	 *
+	 * @var WP_Filesystem_Direct
+	 */
+	private $filesystem;
+
+	/**
+	 * Constructor method.
+	 *
+	 * @param WP_Filesystem_Direct|null $filesystem Instance of the filesystem handler.
+	 */
+	public function __construct( $filesystem = null ) {
+		if ( $filesystem ) {
+			$this->filesystem = $filesystem;
+		} else {
+			$this->filesystem = $this->load_wp_default_filesystem();
+		}
+	}
+
+	/**
+	 * Loads the default WordPress filesystem.
+	 *
+	 * @return WP_Filesystem_Direct The default WordPress filesystem.
+	 */
+	private function load_wp_default_filesystem() : WP_Filesystem_Direct {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		return new WP_Filesystem_Direct( [] );
+	}
+
+	/**
 	 * Saves the sitemap into a sitemap.html file.
 	 *
 	 * @param string $sitemap_html The sitemap.html structure.
 	 */
-	public static function save( $sitemap_html ) : void {
+	public function save( $sitemap_html ) : void {
 		$upload_dir = wp_upload_dir();
 		self::maybe_create_sitemap_dir( $upload_dir );
 
 		$filename = $upload_dir['basedir'] . '/wp-media/sitemap.html';
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
-		file_put_contents( $filename, $sitemap_html );
+		$this->filesystem->put_contents( $filename, $sitemap_html );
 	}
 
 	/**
@@ -31,7 +63,7 @@ final class SitemapFile {
 	 *
 	 * @param array $upload_dir The upload directory.
 	 */
-	private static function maybe_create_sitemap_dir( $upload_dir ) : void {
+	private function maybe_create_sitemap_dir( $upload_dir ) : void {
 		if ( ! file_exists( $upload_dir['basedir'] . '/wp-media' ) ) {
 			wp_mkdir_p( $upload_dir['basedir'] . '/wp-media' );
 		}
@@ -42,10 +74,10 @@ final class SitemapFile {
 	 *
 	 * @return bool True if sitemap.html exists, false otherwise.
 	 */
-	public static function exists() : bool {
+	public function exists() : bool {
 		$upload_dir = wp_upload_dir();
 		$filename   = $upload_dir['basedir'] . '/wp-media/sitemap.html';
-		return file_exists( $filename );
+		return $this->filesystem->exists( $filename );
 	}
 
 	/**
@@ -53,10 +85,9 @@ final class SitemapFile {
 	 *
 	 * @return string The sitemap.html content.
 	 */
-	public static function get() : string {
+	public function get() : string {
 		$upload_dir = wp_upload_dir();
 		$filename   = $upload_dir['basedir'] . '/wp-media/sitemap.html';
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		return file_get_contents( $filename );
+		return $this->filesystem->get_contents( $filename );
 	}
 }

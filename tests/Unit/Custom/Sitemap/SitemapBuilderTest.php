@@ -20,7 +20,7 @@ use WP_Media\Crawler\Schemas\Link;
  * @covers \WP_Media\Crawler\Custom\Sitemap\SitemapBuilder
  * @group Crawlers
  */
-final class LinksCrawlerTest extends TestCase {
+final class SitemapBuilderTest extends TestCase {
 
 	protected function setUp() : void {
 		parent::setUp();
