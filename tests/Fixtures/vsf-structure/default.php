@@ -10,9 +10,7 @@
 return [
 	'wp-content' => [
 		'uploads' => [
-			'wp-media' => [
-				'sitemap.html' => '',
-			],
+			'.' => [],
 		],
 	],
 ];

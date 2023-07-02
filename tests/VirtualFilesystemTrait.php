@@ -146,11 +146,7 @@ trait VirtualFilesystemTrait {
 		return [
 			'wp-admin'      => [],
 			'wp-content'    => [
-				'uploads' => [
-					'wp-media-crawler' => [
-						'sitemap.html' => '',
-					],
-				],
+				'uploads' => [],
 			],
 			'wp-includes'   => [],
 			'wp-config.php' => '',

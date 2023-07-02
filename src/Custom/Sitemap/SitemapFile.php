@@ -25,6 +25,8 @@ final class SitemapFile {
 	 * Constructor method.
 	 *
 	 * @param WP_Filesystem_Direct|null $filesystem Instance of the filesystem handler.
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function __construct( $filesystem = null ) {
 		if ( $filesystem ) {
@@ -38,10 +40,14 @@ final class SitemapFile {
 	 * Loads the default WordPress filesystem.
 	 *
 	 * @return WP_Filesystem_Direct The default WordPress filesystem.
+	 *
+	 * @codeCoverageIgnore
 	 */
 	private function load_wp_default_filesystem() : WP_Filesystem_Direct {
-		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
-		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		if ( ! class_exists( '\WP_Filesystem_Direct' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		}
 		return new WP_Filesystem_Direct( [] );
 	}
 
@@ -64,8 +70,8 @@ final class SitemapFile {
 	 * @param array $upload_dir The upload directory.
 	 */
 	private function maybe_create_sitemap_dir( $upload_dir ) : void {
-		if ( ! file_exists( $upload_dir['basedir'] . '/wp-media' ) ) {
-			wp_mkdir_p( $upload_dir['basedir'] . '/wp-media' );
+		if ( ! $this->filesystem->exists( $upload_dir['basedir'] . '/wp-media' ) ) {
+			$this->filesystem->mkdir( $upload_dir['basedir'] . '/wp-media' );
 		}
 	}
 

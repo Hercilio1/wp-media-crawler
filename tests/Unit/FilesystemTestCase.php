@@ -25,7 +25,5 @@ abstract class FilesystemTestCase extends VirtualFilesystemTestCase {
 
 		$this->initDefaultStructure();
 		$this->init();
-
-		$this->redefineRocketDirectFilesystem();
 	}
 }
