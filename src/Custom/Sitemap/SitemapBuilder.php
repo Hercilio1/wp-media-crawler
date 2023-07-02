@@ -79,7 +79,7 @@ final class SitemapBuilder {
 		$args                  = [];
 		$args['links_wrapper'] = $links_wrapper;
 		ob_start();
-		include WP_MEDIA_CRAWLER_PATH . 'templates/sitemap.php';
+		include WP_MEDIA_CRAWLER_PATH . 'templates/public/sitemap.php';
 		return ob_get_clean();
 	}
 }

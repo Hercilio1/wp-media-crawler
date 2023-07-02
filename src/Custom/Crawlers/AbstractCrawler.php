@@ -51,9 +51,11 @@ abstract class AbstractCrawler {
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( __( 'Error while downloading the home page HTML.', 'wp-media-crawler' ) );
 		}
-		if ( ! isset( $response['body'] ) || empty( $response['body'] ) ) {
+
+		$body = wp_remote_retrieve_body( $response );
+		if ( empty( $body ) ) {
 			throw new Exception( __( 'The homepage HTML is improperly formatted.', 'wp-media-crawler' ) );
 		}
-		return $response['body'];
+		return $body;
 	}
 }

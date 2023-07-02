@@ -169,14 +169,17 @@ final class LinksCrawlerTest extends TestCase {
 	}
 
 	private function mock_default_procedural_functions( $mock_url, $response_body ) : void {
+		$expected_response = [ 'body' => $response_body ];
+
 		Functions\expect( 'wp_remote_get' )
 			->once()
 			->with( $mock_url )
-			->andReturn(
-				[
-					'body' => $response_body,
-				]
-			);
+			->andReturn( $expected_response );
+
+		Functions\expect( 'wp_remote_retrieve_body' )
+			->once()
+			->with( $expected_response )
+			->andReturn( $response_body );
 
 		Functions\expect( 'wp_parse_url' )
 			->andReturnUsing(

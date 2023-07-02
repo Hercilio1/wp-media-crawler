@@ -34,15 +34,25 @@ final class SitemapLinksStorageTest extends TestCase {
 		];
 
 		$expect_stored_object = [
-			[
-				'title' => 'Link 1',
-				'href'  => 'http://example.com/link-1',
-			],
-			[
-				'title' => 'Link 2',
-				'href'  => 'http://example.com/link-2',
+			'updated_at' => time(),
+			'links'      => [
+				[
+					'title' => 'Link 1',
+					'href'  => 'http://example.com/link-1',
+				],
+				[
+					'title' => 'Link 2',
+					'href'  => 'http://example.com/link-2',
+				],
 			],
 		];
+
+		$mock_time_method = $this->getMockBuilder( 'stdClass' )
+			->addMethods( [ 'time' ] )
+			->getMock();
+		$mock_time_method->expects( $this->any() )
+			->method( 'time' )
+			->willReturn( $expect_stored_object['updated_at'] );
 
 		Functions\expect( 'update_option' )
 			->once()
@@ -55,19 +65,17 @@ final class SitemapLinksStorageTest extends TestCase {
 
 	public function test_retrieve() : void {
 		$stored_object = [
-			[
-				'title' => 'Link 1',
-				'href'  => 'http://example.com/link-1',
+			'updated_at' => time(),
+			'links'      => [
+				[
+					'title' => 'Link 1',
+					'href'  => 'http://example.com/link-1',
+				],
+				[
+					'title' => 'Link 2',
+					'href'  => 'http://example.com/link-2',
+				],
 			],
-			[
-				'title' => 'Link 2',
-				'href'  => 'http://example.com/link-2',
-			],
-		];
-
-		$expected_links = [
-			new Link( 'Link 1', 'http://example.com/link-1' ),
-			new Link( 'Link 2', 'http://example.com/link-2' ),
 		];
 
 		Functions\expect( 'get_option' )
@@ -76,6 +84,14 @@ final class SitemapLinksStorageTest extends TestCase {
 			->andReturn( $stored_object );
 
 		$links = SitemapLinksStorage::retrieve();
+
+		$expected_links = [
+			'updated_at' => time(),
+			'links'      => [
+				new Link( 'Link 1', 'http://example.com/link-1' ),
+				new Link( 'Link 2', 'http://example.com/link-2' ),
+			],
+		];
 
 		$this->assertEquals( $expected_links, $links );
 	}

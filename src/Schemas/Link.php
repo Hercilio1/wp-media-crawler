@@ -36,4 +36,14 @@ class Link {
 		$this->title = $title;
 		$this->href  = $href;
 	}
+
+	/**
+	 * Returns the link href with the URL domain.
+	 *
+	 * @return string The link href with the URL domain.
+	 */
+	public function get_href_with_domain() : string {
+		$has_domain = wp_parse_url( $this->href, PHP_URL_HOST );
+		return empty( $has_domain ) ? home_url( $this->href ) : $this->href;
+	}
 }

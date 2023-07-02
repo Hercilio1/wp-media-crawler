@@ -7,6 +7,7 @@
 
 namespace WP_Media\Crawler\Custom\Sitemap;
 
+use RuntimeException;
 use WP_Filesystem_Direct;
 
 /**
@@ -41,12 +42,14 @@ final class SitemapFile {
 	 *
 	 * @return WP_Filesystem_Direct The default WordPress filesystem.
 	 *
-	 * @codeCoverageIgnore
+	 * @throws RuntimeException If WP_Filesystem not found or not loaded.
 	 */
 	private function load_wp_default_filesystem() : WP_Filesystem_Direct {
-		if ( ! class_exists( '\WP_Filesystem_Direct' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
-			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		if ( ! function_exists( '\\WP_Filesystem' ) ) {
+			throw new RuntimeException( 'WP_Filesystem not found.' );
+		}
+		if ( ! WP_Filesystem() ) {
+			throw new RuntimeException( 'WP_Filesystem not loaded.' );
 		}
 		return new WP_Filesystem_Direct( [] );
 	}

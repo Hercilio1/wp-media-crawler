@@ -19,13 +19,13 @@ final class SitemapRouter {
 	 */
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'add_rewrite_rule' ], 1 );
-		add_action( 'pre_get_posts', [ __CLASS__, 'redirect' ], 1 );
+		add_action( 'wp', [ __CLASS__, 'redirect' ], 1 );
 	}
 
 	/**
 	 * Sets up rewrite rules.
 	 */
-	public function add_rewrite_rule() : void {
+	public static function add_rewrite_rule() : void {
 		global $wp;
 
 		$wp->add_query_var( 'wp_media_sitemap' );
@@ -38,7 +38,7 @@ final class SitemapRouter {
 	 *
 	 * @param \WP_Query $query The WP_Query instance.
 	 */
-	public function redirect( $query ) : void {
+	public static function redirect( $query ) : void {
 		if ( ! $query->is_main_query() ) {
 			return;
 		}
@@ -52,7 +52,9 @@ final class SitemapRouter {
 		// it from the links stored in the database. I chose to get it from the filesystem because
 		// of the non functional definition.
 
-		if ( ! SitemapFile::exists() ) {
+		$sitemap_file = new SitemapFile();
+
+		if ( ! $sitemap_file->exists() ) {
 			$query->set_404();
 			status_header( 404 );
 			return;
@@ -60,7 +62,7 @@ final class SitemapRouter {
 
 		self::sitemap_open();
 
-		echo SitemapFile::get(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $sitemap_file->get(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		self::sitemap_close();
 	}

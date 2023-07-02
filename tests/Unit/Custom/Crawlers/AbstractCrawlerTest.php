@@ -61,6 +61,10 @@ final class AbstractCrawlerTest extends TestCase {
 			->with( $mock_url )
 			->andReturn( [] );
 
+		Functions\expect( 'wp_remote_retrieve_body' )
+			->with( [] )
+			->andReturn( '' );
+
 		Functions\expect( '__' )
 			->once()
 			->andReturn( $error_msg );
