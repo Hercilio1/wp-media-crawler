@@ -37,12 +37,8 @@ class CrawlLinksHandler {
 		}
 
 		try {
-			$links        = ( new LinksCrawler( home_url() ) )->crawl();
-			$sitemap_file = new SitemapFile();
-
+			$links = ( new LinksCrawler( home_url() ) )->crawl();
 			SitemapLinksStorage::store( $links );
-			$sitemap_html = ( new SitemapBuilder( $links ) )->build();
-			$sitemap_file->save( $sitemap_html );
 		} catch ( Exception $e ) {
 			wp_die( esc_html( $e->getMessage() ) );
 			// TODO: Improve error handling.

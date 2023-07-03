@@ -8,7 +8,7 @@
 /**
  * Attributes of the template.
  *
- * @var \WP_Media\Crawler\Schemas\Link[] $wp_media_sitemap_links.
+ * @var \WP_Media\Crawler\Schemas\LinksRecord $wp_media_sitemap_links - The links Record.
  */
 
 list(
@@ -26,18 +26,27 @@ list(
 		<input type="hidden" name="action" value="wp_media_crawler_crawl_sitemap_links">
 		<?php wp_nonce_field( 'wp_media_crawler_crawl_sitemap_links' ); ?>
 	</form>
+
 	// TODO: Add overview showing the options of checking out the sitemap.html or to crawl the links if there is no sitemap.html.
 	<br>
 	// TODO: Add overview of the cronjob.
-	<br>
-	// TODO: List the links and the last time they were crawled.
 	<hr>
+
 	<h2><?php esc_html_e( 'Sitemap Links', 'wp-media-crawler' ); ?></h2>
-	<?php if ( ! empty( $wp_media_sitemap_links ) ) : ?>
+
+	<?php if ( $wp_media_sitemap_links ) : ?>
 		<p><?php esc_html_e( 'The following table shows the links found by the sitemap crawler.', 'wp-media-crawler' ); ?></p>
-		// TODO: Improve the date format.
-		<?php /* translators: %s: the timestamp */ ?>
-		<p><?php echo esc_html( sprintf( __( 'The last crawl happened at: %s', 'wp-media-crawler' ), $wp_media_sitemap_links['updated_at'] ) ); ?></p>
+		<p>
+		<?php
+		echo esc_html(
+			sprintf(
+				/* translators: %s: the timestamp */
+				__( 'The last crawl happened at: %s', 'wp-media-crawler' ),
+				$wp_media_sitemap_links->get_formatted_timestamp()
+			)
+		);
+		?>
+		</p>
 		<table class="wp-list-table widefat fixed striped" style="max-width: 1000px">
 			<thead>
 				<tr>
@@ -46,7 +55,7 @@ list(
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ( $wp_media_sitemap_links['links'] as $wp_media_sitemap_link ) : ?>
+				<?php foreach ( $wp_media_sitemap_links->links as $wp_media_sitemap_link ) : ?>
 					<tr>
 						<td><?php echo esc_html( $wp_media_sitemap_link->title ); ?></td>
 						<td>

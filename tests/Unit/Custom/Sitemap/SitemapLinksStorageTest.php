@@ -15,6 +15,7 @@ use Brain\Monkey\Functions;
 use \PHPUnit\Framework\TestCase;
 use WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage;
 use WP_Media\Crawler\Schemas\Link;
+use WP_Media\Crawler\Schemas\LinksRecord;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage
@@ -33,30 +34,18 @@ final class SitemapLinksStorageTest extends TestCase {
 			new Link( 'Link 2', 'http://example.com/link-2' ),
 		];
 
-		$expect_stored_object = [
-			'updated_at' => time(),
-			'links'      => [
-				[
-					'title' => 'Link 1',
-					'href'  => 'http://example.com/link-1',
-				],
-				[
-					'title' => 'Link 2',
-					'href'  => 'http://example.com/link-2',
-				],
-			],
-		];
+		$expect_stored_object = new LinksRecord( $links, time() );
 
 		$mock_time_method = $this->getMockBuilder( 'stdClass' )
 			->addMethods( [ 'time' ] )
 			->getMock();
 		$mock_time_method->expects( $this->any() )
 			->method( 'time' )
-			->willReturn( $expect_stored_object['updated_at'] );
+			->willReturn( $expect_stored_object->timestamp );
 
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'wp_media_crawler_sitemap_links', $expect_stored_object );
+			->with( 'wp_media_crawler_sitemap_links', $expect_stored_object->serialize() );
 
 		SitemapLinksStorage::store( $links );
 
@@ -64,9 +53,11 @@ final class SitemapLinksStorageTest extends TestCase {
 	}
 
 	public function test_retrieve() : void {
+		$timestamp = time();
+
 		$stored_object = [
-			'updated_at' => time(),
-			'links'      => [
+			'timestamp' => $timestamp,
+			'links'     => [
 				[
 					'title' => 'Link 1',
 					'href'  => 'http://example.com/link-1',
@@ -85,29 +76,31 @@ final class SitemapLinksStorageTest extends TestCase {
 
 		$links = SitemapLinksStorage::retrieve();
 
-		$expected_links = [
-			'updated_at' => time(),
-			'links'      => [
+		$expected_links = new LinksRecord(
+			[
 				new Link( 'Link 1', 'http://example.com/link-1' ),
 				new Link( 'Link 2', 'http://example.com/link-2' ),
 			],
-		];
+			$timestamp
+		);
 
 		$this->assertEquals( $expected_links, $links );
 	}
 
-	public function test_retrieve_of_bad_stored_links() : void {
+	public function test_retrieve_badly_stored_links() : void {
+		$timestamp     = time();
 		$stored_object = [
-			[
-				'title' => 'Link 1',
-			],
-			[
-				'titles' => 'Link 2',
-				'uri'    => 'http://example.com/link-2',
+			'timestamp' => $timestamp,
+			'links'     => [
+				[
+					'title' => 'Link 1',
+				],
+				[
+					'titles' => 'Link 2',
+					'uri'    => 'http://example.com/link-2',
+				],
 			],
 		];
-
-		$expected_links = [];
 
 		Functions\expect( 'get_option' )
 			->once()
@@ -116,7 +109,28 @@ final class SitemapLinksStorageTest extends TestCase {
 
 		$links = SitemapLinksStorage::retrieve();
 
-		$this->assertEquals( $expected_links, $links );
+		$this->assertEquals( new LinksRecord( [], $timestamp ), $links );
+	}
+
+	public function test_retrieve_badly_stored_timestamp() : void {
+		$stored_object = [
+			'timestamp' => '2023-07-03 00:00:00',
+			'links'     => [
+				[
+					'title' => 'Link 1',
+					'href'  => 'http://example.com/link-1',
+				],
+			],
+		];
+
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'wp_media_crawler_sitemap_links', [] )
+			->andReturn( $stored_object );
+
+		$links = SitemapLinksStorage::retrieve();
+
+		$this->assertNull( $links );
 	}
 
 	public function test_delete() : void {

@@ -23,10 +23,10 @@ list(
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 
-	<title><?php bloginfo( 'name' ); ?> | Sitemap</title>
+	<title><?php bloginfo( 'name' ); ?> | <?php esc_html_e( 'Sitemap', 'wp-media-crawler' ); ?></title>
 </head>
 <body>
-	<h1>Sitemap</h1>
+	<h1><?php bloginfo( 'name' ); ?> - <?php esc_html_e( 'Sitemap', 'wp-media-crawler' ); ?></h1>
 	<?php
 	echo wp_kses(
 		$wp_media_links_wrapper,

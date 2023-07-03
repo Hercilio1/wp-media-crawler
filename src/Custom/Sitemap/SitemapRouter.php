@@ -19,7 +19,7 @@ final class SitemapRouter {
 	 */
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'add_rewrite_rule' ], 1 );
-		add_action( 'wp', [ __CLASS__, 'redirect' ], 1 );
+		add_action( 'pre_get_posts', [ __CLASS__, 'redirect' ], 1 );
 	}
 
 	/**
@@ -52,9 +52,9 @@ final class SitemapRouter {
 		// it from the links stored in the database. I chose to get it from the filesystem because
 		// of the non functional definition.
 
-		$sitemap_file = new SitemapFile();
+		$sitemap_links = SitemapLinksStorage::retrieve();
 
-		if ( ! $sitemap_file->exists() ) {
+		if ( ! $sitemap_links || empty( $sitemap_links->links ) ) {
 			$query->set_404();
 			status_header( 404 );
 			return;
@@ -62,7 +62,9 @@ final class SitemapRouter {
 
 		self::sitemap_open();
 
-		echo $sitemap_file->get(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$sitemap_builder = new SitemapBuilder( $sitemap_links->links );
+
+		echo $sitemap_builder->build(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		self::sitemap_close();
 	}

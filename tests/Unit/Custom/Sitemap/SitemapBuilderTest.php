@@ -39,6 +39,8 @@ final class SitemapBuilderTest extends TestCase {
 
 		Functions\expect( 'bloginfo' );
 
+		Functions\expect( 'esc_html_e' );
+
 		Functions\expect( 'wp_kses' )
 			->once()
 			->andReturnUsing(
