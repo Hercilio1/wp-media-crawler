@@ -8,6 +8,7 @@
 namespace WP_Media\Crawler\Custom\Crawlers;
 
 use \Symfony\Component\DomCrawler\Crawler;
+use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
 use WP_Media\Crawler\Schemas\Link;
 
 /**
@@ -23,6 +24,13 @@ final class LinksCrawler extends AbstractCrawler {
 	private $links = [];
 
 	/**
+	 * The links set
+	 *
+	 * @var array $links_set
+	 */
+	private $links_set = [];
+
+	/**
 	 * Internal domain.
 	 *
 	 * @var string $internal_domain
@@ -33,6 +41,8 @@ final class LinksCrawler extends AbstractCrawler {
 	 * Crawls the links of a Webpage.
 	 *
 	 * @return array The links found.
+	 *
+	 * @throws WebpageException If the page doesn't have any link.
 	 */
 	public function crawl() : array {
 		$html = $this->get_the_webpage_content();
@@ -43,6 +53,9 @@ final class LinksCrawler extends AbstractCrawler {
 					$this->add_link( $node );
 				}
 			);
+		}
+		if ( empty( $this->links ) ) {
+			throw new WebpageException( __( 'The page doesn\'t have any internal link.', 'wp-media-crawler' ), $this->url );
 		}
 		return $this->links;
 	}
@@ -59,7 +72,7 @@ final class LinksCrawler extends AbstractCrawler {
 			return;
 		}
 		$href = $node->attr( 'href' );
-		if ( $this->is_internal_link( $href ) ) {
+		if ( $this->is_internal_link( $href ) && $this->is_link_unique( $href ) ) {
 			$this->links[] = new Link( $title, $href );
 		}
 	}
@@ -106,5 +119,25 @@ final class LinksCrawler extends AbstractCrawler {
 			return '';
 		}
 		return $domain;
+	}
+
+	/**
+	 * Checks if the link is unique.
+	 *
+	 * @param string $link - The link to check.
+	 *
+	 * @return bool - True if the link is unique, false otherwise.
+	 */
+	private function is_link_unique( $link ) : bool {
+		$host = wp_parse_url( $link, PHP_URL_HOST );
+		if ( ! empty( $host ) ) {
+			$splitted_link = explode( $host, $link );
+			$link          = end( $splitted_link );
+		}
+		if ( isset( $this->links_set[ $link ] ) ) {
+			return false;
+		}
+		$this->links_set[ $link ] = true;
+		return true;
 	}
 }

@@ -13,6 +13,7 @@ namespace WP_Media\Crawler\Tests\Unit\Custom\Crawlers;
 
 use Brain\Monkey\Functions;
 use \PHPUnit\Framework\TestCase;
+use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
 use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
 use WP_Media\Crawler\Schemas\Link;
 
@@ -101,7 +102,11 @@ final class LinksCrawlerTest extends TestCase {
 	}
 
 	public function test_crawl_without_links() : void {
-		$mock_url = 'http://example.com';
+		$mock_url  = 'http://example.com';
+		$error_msg = 'The page doesn\'t have any internal link.';
+
+		$this->expectException( WebpageException::class );
+		$this->expectExceptionMessage( $error_msg );
 
 		$this->mock_default_procedural_functions(
 			$mock_url,
@@ -114,11 +119,12 @@ final class LinksCrawlerTest extends TestCase {
 			</html>'
 		);
 
-		$crawler = new LinksCrawler( $mock_url );
-		$result  = $crawler->crawl();
+		Functions\expect( '__' )
+			->once()
+			->andReturn( $error_msg );
 
-		$this->assertIsArray( $result );
-		$this->assertEmpty( $result );
+		$crawler = new LinksCrawler( $mock_url );
+		$crawler->crawl();
 	}
 
 	public function test_crawl_with_external_links() : void {
@@ -168,8 +174,34 @@ final class LinksCrawlerTest extends TestCase {
 		$this->assertEquals( $expected_result, $result );
 	}
 
+	public function test_crawl_with_repeated_links() : void {
+		$mock_url = 'http://example.com';
+
+		$this->mock_default_procedural_functions(
+			$mock_url,
+			'<!DOCTYPE html>
+			<html>
+				<body>
+					<a href="/link-1">Link 1</a>
+					<a href="http://example.com/link-1">Link 2</a>
+				</body>
+			</html>'
+		);
+
+		$crawler = new LinksCrawler( $mock_url );
+		$result  = $crawler->crawl();
+
+		$expected_result = [
+			new Link( 'Link 1', '/link-1' ),
+		];
+		$this->assertEquals( $expected_result, $result );
+	}
+
 	private function mock_default_procedural_functions( $mock_url, $response_body ) : void {
-		$expected_response = [ 'body' => $response_body ];
+		$expected_response = [
+			'body'     => $response_body,
+			'response' => [ 'code' => 200 ],
+		];
 
 		Functions\expect( 'wp_remote_get' )
 			->once()
@@ -180,6 +212,11 @@ final class LinksCrawlerTest extends TestCase {
 			->once()
 			->with( $expected_response )
 			->andReturn( $response_body );
+
+		Functions\expect( 'wp_remote_retrieve_response_code' )
+			->once()
+			->with( $expected_response )
+			->andReturn( 200 );
 
 		Functions\expect( 'wp_parse_url' )
 			->andReturnUsing(

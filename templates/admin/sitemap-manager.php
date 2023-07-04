@@ -25,26 +25,45 @@ list(
 		<button type="submit" class="button button-primary">Crawl Sitemap Links</button>
 		<input type="hidden" name="action" value="wp_media_crawler_crawl_sitemap_links">
 		<?php wp_nonce_field( 'wp_media_crawler_crawl_sitemap_links' ); ?>
+		<?php settings_errors( 'wp-media-crawler-sitemap-manager' ); ?>
 	</form>
 
-	// TODO: Add overview showing the options of checking out the sitemap.html or to crawl the links if there is no sitemap.html.
-	<br>
 	// TODO: Add overview of the cronjob.
 	<hr>
 
-	<h2><?php esc_html_e( 'Sitemap Links', 'wp-media-crawler' ); ?></h2>
+	<h2><?php esc_html_e( 'Overview:', 'wp-media-crawler' ); ?></h2>
+	<p>
+		<?php esc_html_e( 'The visitors can view the sitemap through the following page:', 'wp-media-crawler' ); ?>
+		<a href="<?php echo esc_url( home_url( '/sitemap.html' ) ); ?>" target="_blank" title="<?php esc_attr_e( ' View sitemap', 'wp-media-crawler' ); ?>">
+			<?php echo esc_html( home_url( '/sitemap.html' ) ); ?>
+		</a>
+	</p>
 
+	<hr>
+
+	<h2><?php esc_html_e( 'Sitemap Links:', 'wp-media-crawler' ); ?></h2>
 	<?php if ( $wp_media_sitemap_links ) : ?>
 		<p><?php esc_html_e( 'The following table shows the links found by the sitemap crawler.', 'wp-media-crawler' ); ?></p>
 		<p>
+			<?php
+			echo esc_html(
+				sprintf(
+					/* translators: %s: the timestamp */
+					__( 'The last crawl happened at: %s', 'wp-media-crawler' ),
+					$wp_media_sitemap_links->get_formatted_timestamp()
+				)
+			);
+			?>
+		</p>
+		<p>
 		<?php
-		echo esc_html(
-			sprintf(
-				/* translators: %s: the timestamp */
-				__( 'The last crawl happened at: %s', 'wp-media-crawler' ),
-				$wp_media_sitemap_links->get_formatted_timestamp()
-			)
-		);
+			echo esc_html(
+				sprintf(
+					/* translators: %s: the total of links */
+					__( 'Total of links: %s', 'wp-media-crawler' ),
+					count( $wp_media_sitemap_links->links )
+				)
+			);
 		?>
 		</p>
 		<table class="wp-list-table widefat fixed striped" style="max-width: 1000px">
@@ -69,8 +88,7 @@ list(
 			</tbody>
 		</table>
 	<?php else : ?>
-		// TODO: Add message when there is not links stored.
-		<br>
-		<p><?php esc_html_e( 'There are no links stored.', 'wp-media-crawler' ); ?></p>
+		<p><?php esc_html_e( 'There are no crawled links.', 'wp-media-crawler' ); ?></p>
+		<p><?php esc_html_e( 'You can crawl the sitemap links by clicking on the button above.', 'wp-media-crawler' ); ?></p>
 	<?php endif; ?>
 </div>

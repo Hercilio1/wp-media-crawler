@@ -8,10 +8,6 @@
 namespace WP_Media\Crawler;
 
 use WP_Media\Crawler\Custom\Admin\SitemapManager\InitSitemapManager;
-use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
-use WP_Media\Crawler\Custom\Sitemap\SitemapBuilder;
-use WP_Media\Crawler\Custom\Sitemap\SitemapFile;
-use WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage;
 use WP_Media\Crawler\Custom\Sitemap\SitemapRouter;
 
 /**
@@ -25,21 +21,5 @@ class Init {
 	public static function init() {
 		SitemapRouter::init();
 		InitSitemapManager::init();
-		add_action(
-			'admin_init',
-			function() {
-				if ( isset( $_GET['wp_media'] ) && 'test' === $_GET['wp_media'] ) {
-					$links = ( new LinksCrawler( home_url() ) )->crawl();
-					SitemapLinksStorage::store( $links );
-
-					$sitemap_html = ( new SitemapBuilder( $links ) )->build();
-					( new SitemapFile() )->save( $sitemap_html );
-
-					echo '<pre>';
-					print_r( $links );
-					exit;
-				}
-			}
-		);
 	}
 }

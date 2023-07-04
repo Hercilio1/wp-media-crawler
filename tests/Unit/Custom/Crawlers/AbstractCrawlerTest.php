@@ -14,6 +14,7 @@ namespace WP_Media\Crawler\Tests\Unit\Custom\Crawlers;
 use Brain\Monkey\Functions;
 use Mockery;
 use \PHPUnit\Framework\TestCase;
+use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
 use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
 
 /**
@@ -29,9 +30,9 @@ final class AbstractCrawlerTest extends TestCase {
 
 	public function test_request_exception() : void {
 		$mock_url  = 'http://example.com';
-		$error_msg = 'Error while downloading the home page HTML.';
+		$error_msg = 'The page isn\'t accessible.';
 
-		$this->expectException( \Exception::class );
+		$this->expectException( WebpageException::class );
 		$this->expectExceptionMessage( $error_msg );
 
 		Mockery::mock( 'overload:WP_Error' );
@@ -48,18 +49,46 @@ final class AbstractCrawlerTest extends TestCase {
 		$crawler->crawl();
 	}
 
-	public function test_response_body_exception() : void {
-		$mock_url  = 'http://example.com';
-		$error_msg = 'The homepage HTML is improperly formatted.';
+	public function test_response_code_exception() : void {
+		$mock_url      = 'http://example.com';
+		$error_msg     = 'The page isn\'t accessible.';
+		$response_body = [ 'response' => [ 'code' => 404 ] ];
 
-		$this->expectException( \Exception::class );
+		$this->expectException( WebpageException::class );
 		$this->expectExceptionMessage( $error_msg );
-
-		Mockery::mock( 'overload:WP_Error' );
 
 		Functions\expect( 'wp_remote_get' )
 			->with( $mock_url )
-			->andReturn( [] );
+			->andReturn( $response_body );
+
+		Functions\expect( 'wp_remote_retrieve_response_code' )
+			->with( $response_body )
+			->andReturn( 404 );
+
+		Functions\expect( '__' )
+			->once()
+			->andReturn( $error_msg );
+
+		$crawler = new LinksCrawler( $mock_url );
+		$crawler->crawl();
+	}
+
+
+	public function test_response_body_exception() : void {
+		$mock_url      = 'http://example.com';
+		$error_msg     = 'The page\'s body is malformed.';
+		$response_body = [ 'response' => [ 'code' => 200 ] ];
+
+		$this->expectException( WebpageException::class );
+		$this->expectExceptionMessage( $error_msg );
+
+		Functions\expect( 'wp_remote_get' )
+			->with( $mock_url )
+			->andReturn( $response_body );
+
+		Functions\expect( 'wp_remote_retrieve_response_code' )
+			->with( $response_body )
+			->andReturn( 404 );
 
 		Functions\expect( 'wp_remote_retrieve_body' )
 			->with( [] )

@@ -43,6 +43,8 @@ final class SitemapFile {
 	 * @return WP_Filesystem_Direct The default WordPress filesystem.
 	 *
 	 * @throws RuntimeException If WP_Filesystem not found or not loaded.
+	 *
+	 * @codeCoverageIgnore
 	 */
 	private function load_wp_default_filesystem() : WP_Filesystem_Direct {
 		if ( ! function_exists( '\\WP_Filesystem' ) ) {

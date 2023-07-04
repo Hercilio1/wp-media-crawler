@@ -8,6 +8,7 @@
 namespace WP_Media\Crawler\Custom\Crawlers;
 
 use Exception;
+use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
 
 /**
  * Class AbstractCrawler. Abstraction of any crawler.
@@ -19,7 +20,7 @@ abstract class AbstractCrawler {
 	 *
 	 * @var string $url
 	 */
-	private $url;
+	protected $url;
 
 	/**
 	 * Constructor method.
@@ -42,19 +43,24 @@ abstract class AbstractCrawler {
 	 *
 	 * @return string The web page content.
 	 *
-	 * @throws Exception If the page request returns an error.
-	 * @throws Exception If the response body is empty.
+	 * @throws WebpageException If the page request returns an error.
+	 * @throws WebpageException If the response body is empty.
 	 */
 	public function get_the_webpage_content() : string {
 		$response = wp_remote_get( $this->url );
 
 		if ( is_wp_error( $response ) ) {
-			throw new Exception( __( 'Error while downloading the home page HTML.', 'wp-media-crawler' ) );
+			throw new WebpageException( __( 'The page isn\'t accessible.', 'wp-media-crawler' ), $this->url );
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $response_code ) {
+			throw new WebpageException( __( 'The page isn\'t accessible.', 'wp-media-crawler' ), $this->url );
 		}
 
 		$body = wp_remote_retrieve_body( $response );
 		if ( empty( $body ) ) {
-			throw new Exception( __( 'The homepage HTML is improperly formatted.', 'wp-media-crawler' ) );
+			throw new WebpageException( __( 'The page\'s body is malformed.', 'wp-media-crawler' ), $this->url );
 		}
 		return $body;
 	}
