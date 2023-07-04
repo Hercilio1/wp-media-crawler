@@ -29,19 +29,16 @@ final class SitemapLinksStorageTest extends TestCase {
 	}
 
 	public function test_store() : void {
+		$timestamp = time();
+
 		$links = [
 			new Link( 'Link 1', 'http://example.com/link-1' ),
 			new Link( 'Link 2', 'http://example.com/link-2' ),
 		];
 
-		$expect_stored_object = new LinksRecord( $links, time() );
+		Functions\stubs( [ 'time' => $timestamp ] );
 
-		$mock_time_method = $this->getMockBuilder( 'stdClass' )
-			->addMethods( [ 'time' ] )
-			->getMock();
-		$mock_time_method->expects( $this->any() )
-			->method( 'time' )
-			->willReturn( $expect_stored_object->timestamp );
+		$expect_stored_object = new LinksRecord( $links, $timestamp );
 
 		Functions\expect( 'update_option' )
 			->once()
@@ -87,6 +84,63 @@ final class SitemapLinksStorageTest extends TestCase {
 		$this->assertEquals( $expected_links, $links );
 	}
 
+	public function test_retrieve_without_links() : void {
+		$timestamp     = time();
+		$stored_object = [
+			'timestamp' => $timestamp,
+		];
+
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'wp_media_crawler_sitemap_links', [] )
+			->andReturn( $stored_object );
+
+		$links = SitemapLinksStorage::retrieve();
+
+		$this->assertNull( $links );
+	}
+
+	public function test_retrieve_without_timestamp() : void {
+		$stored_object = [
+			'links' => [
+				[
+					'title' => 'Link 1',
+					'href'  => 'http://example.com/link-1',
+				],
+			],
+		];
+
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'wp_media_crawler_sitemap_links', [] )
+			->andReturn( $stored_object );
+
+		$links = SitemapLinksStorage::retrieve();
+
+		$this->assertNull( $links );
+	}
+
+	public function test_retrieve_badly_stored_timestamp() : void {
+		$stored_object = [
+			'timestamp' => '2023-07-03 00:00:00',
+			'links'     => [
+				[
+					'title' => 'Link 1',
+					'href'  => 'http://example.com/link-1',
+				],
+			],
+		];
+
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'wp_media_crawler_sitemap_links', [] )
+			->andReturn( $stored_object );
+
+		$links = SitemapLinksStorage::retrieve();
+
+		$this->assertNull( $links );
+	}
+
 	public function test_retrieve_badly_stored_links() : void {
 		$timestamp     = time();
 		$stored_object = [
@@ -110,27 +164,6 @@ final class SitemapLinksStorageTest extends TestCase {
 		$links = SitemapLinksStorage::retrieve();
 
 		$this->assertEquals( new LinksRecord( [], $timestamp ), $links );
-	}
-
-	public function test_retrieve_badly_stored_timestamp() : void {
-		$stored_object = [
-			'timestamp' => '2023-07-03 00:00:00',
-			'links'     => [
-				[
-					'title' => 'Link 1',
-					'href'  => 'http://example.com/link-1',
-				],
-			],
-		];
-
-		Functions\expect( 'get_option' )
-			->once()
-			->with( 'wp_media_crawler_sitemap_links', [] )
-			->andReturn( $stored_object );
-
-		$links = SitemapLinksStorage::retrieve();
-
-		$this->assertNull( $links );
 	}
 
 	public function test_delete() : void {
