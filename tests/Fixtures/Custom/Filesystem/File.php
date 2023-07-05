@@ -16,7 +16,7 @@ return [
 			],
 			'uploads-file-exists-test' => [
 				'wp-media' => [
-					'sitemap.html' => '<html><body><h1>Sitemap</h1></body></html>',
+					'home.html' => '<html><body><h1>Home</h1></body></html>',
 				],
 			],
 		],

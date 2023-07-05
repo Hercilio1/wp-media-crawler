@@ -8,9 +8,12 @@
 namespace WP_Media\Crawler\Custom\Admin\SitemapManager;
 
 use Exception;
-use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
 use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
+use WP_Media\Crawler\Custom\Crawlers\WebpageReader;
+use WP_Media\Crawler\Custom\Filesystem\File;
 use WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage;
+use WP_Media\Crawler\Exceptions\CrawlerException;
+use WP_Media\Crawler\Exceptions\WebpageException;
 
 /**
  * Class CrawlLinksHandler. Responsible for handling the crawl sitemap links request.
@@ -36,10 +39,23 @@ class CrawlLinksHandler {
 		}
 
 		try {
-			$links = ( new LinksCrawler( home_url() ) )->crawl();
-			SitemapLinksStorage::store( $links );
+			$home_file = new File( 'home.html' );
+
+			SitemapLinksStorage::delete();
+			$home_file->delete();
+
+			$page_reader      = new WebpageReader( home_url() );
+			$response_content = $page_reader->get_content();
+
+			$link_crawler = new LinksCrawler( $response_content );
+			SitemapLinksStorage::store( $link_crawler->crawl() );
+
+			// Custom step: Save the home page’s .php file as a .html file.
+			$home_file->save( $response_content );
 		} catch ( WebpageException $e ) {
 			self::handle_error( $e->get_error_message_html() );
+		} catch ( CrawlerException $e ) {
+			self::handle_error( $e->getMessage() );
 		} catch ( Exception $e ) {
 			self::handle_error( 'The following ocurred while crawling the links: ' . $e->getMessage() );
 		}

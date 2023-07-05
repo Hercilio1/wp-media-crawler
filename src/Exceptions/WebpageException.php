@@ -5,7 +5,7 @@
  * @package WP_Media_Crawler
  */
 
-namespace WP_Media\Crawler\Custom\Crawlers\Exceptions;
+namespace WP_Media\Crawler\Exceptions;
 
 use Exception;
 

@@ -14,14 +14,14 @@ namespace WP_Media\Crawler\Tests\Unit\Custom\Crawlers;
 use Brain\Monkey\Functions;
 use Mockery;
 use \PHPUnit\Framework\TestCase;
-use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
-use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
+use WP_Media\Crawler\Custom\Crawlers\WebpageReader;
+use WP_Media\Crawler\Exceptions\WebpageException;
 
 /**
- * @covers \WP_Media\Crawler\Custom\Crawlers\AbstractCrawler
+ * @covers \WP_Media\Crawler\Custom\Crawlers\WebpageReader
  * @group Crawlers
  */
-final class AbstractCrawlerTest extends TestCase {
+final class WebpageReaderTest extends TestCase {
 
 	protected function setUp() : void {
 		parent::setUp();
@@ -45,8 +45,8 @@ final class AbstractCrawlerTest extends TestCase {
 			->once()
 			->andReturn( $error_msg );
 
-		$crawler = new LinksCrawler( $mock_url );
-		$crawler->crawl();
+		$crawler = new WebpageReader( $mock_url );
+		$crawler->get_content();
 	}
 
 	public function test_response_code_exception() : void {
@@ -69,8 +69,8 @@ final class AbstractCrawlerTest extends TestCase {
 			->once()
 			->andReturn( $error_msg );
 
-		$crawler = new LinksCrawler( $mock_url );
-		$crawler->crawl();
+		$crawler = new WebpageReader( $mock_url );
+		$crawler->get_content();
 	}
 
 
@@ -98,8 +98,8 @@ final class AbstractCrawlerTest extends TestCase {
 			->once()
 			->andReturn( $error_msg );
 
-		$crawler = new LinksCrawler( $mock_url );
-		$crawler->crawl();
+		$crawler = new WebpageReader( $mock_url );
+		$crawler->get_content();
 	}
 
 	protected function tearDown() : void {

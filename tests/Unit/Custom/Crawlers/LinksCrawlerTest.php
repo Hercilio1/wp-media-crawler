@@ -13,13 +13,12 @@ namespace WP_Media\Crawler\Tests\Unit\Custom\Crawlers;
 
 use Brain\Monkey\Functions;
 use \PHPUnit\Framework\TestCase;
-use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
 use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
+use WP_Media\Crawler\Exceptions\CrawlerException;
 use WP_Media\Crawler\Schemas\Link;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Crawlers\LinksCrawler
- * @covers \WP_Media\Crawler\Custom\Crawlers\AbstractCrawler
  * @covers \WP_Media\Crawler\Schemas\Link
  * @group Crawlers
  */
@@ -33,18 +32,17 @@ final class LinksCrawlerTest extends TestCase {
 	public function test_crawl_well_formed_links() : void {
 		$mock_url = 'http://example.com';
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<a href="http://example.com/link-1">Link 1</a>
 					<a href="http://example.com/link-2">Link 2</a>
 				</body>
-			</html>'
-		);
+			</html>';
 
-		$crawler = new LinksCrawler( $mock_url );
+		$this->mock_default_procedural_functions( $mock_url );
+
+		$crawler = new LinksCrawler( $html );
 		$result  = $crawler->crawl();
 
 		$expected_result = [
@@ -57,18 +55,16 @@ final class LinksCrawlerTest extends TestCase {
 	public function test_crawl_with_links_without_title() : void {
 		$mock_url = 'http://example.com';
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<a href="http://example.com/link-1"><img src="http://example.com/img-1" /></a>
 					<a href="http://example.com/link-2">Link 2</a>
 				</body>
-			</html>'
-		);
+			</html>';
+		$this->mock_default_procedural_functions( $mock_url );
 
-		$crawler = new LinksCrawler( $mock_url );
+		$crawler = new LinksCrawler( $html );
 		$result  = $crawler->crawl();
 
 		$expected_result = [
@@ -80,18 +76,16 @@ final class LinksCrawlerTest extends TestCase {
 	public function test_crawl_with_links_with_title_as_attribute() : void {
 		$mock_url = 'http://example.com';
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<a href="http://example.com/link-1" title="Link 1"><img src="http://example.com/img-1" /></a>
 					<a href="http://example.com/link-2">Link 2</a>
 				</body>
-			</html>'
-		);
+			</html>';
+		$this->mock_default_procedural_functions( $mock_url );
 
-		$crawler = new LinksCrawler( $mock_url );
+		$crawler = new LinksCrawler( $html );
 		$result  = $crawler->crawl();
 
 		$expected_result = [
@@ -105,43 +99,39 @@ final class LinksCrawlerTest extends TestCase {
 		$mock_url  = 'http://example.com';
 		$error_msg = 'The page doesn\'t have any internal link.';
 
-		$this->expectException( WebpageException::class );
+		$this->expectException( CrawlerException::class );
 		$this->expectExceptionMessage( $error_msg );
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<p>Not a link 1</p>
 					<span>Not a link 2</span>
 				</body>
-			</html>'
-		);
+			</html>';
+		$this->mock_default_procedural_functions( $mock_url );
 
 		Functions\expect( '__' )
 			->once()
 			->andReturn( $error_msg );
 
-		$crawler = new LinksCrawler( $mock_url );
+		$crawler = new LinksCrawler( $html );
 		$crawler->crawl();
 	}
 
 	public function test_crawl_with_external_links() : void {
 		$mock_url = 'http://example.com';
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<a href="http://example.com.eu/link-1">Link 1</a>
 					<a href="http://example.com/link-2">Link 2</a>
 				</body>
-			</html>'
-		);
+			</html>';
+		$this->mock_default_procedural_functions( $mock_url );
 
-		$crawler = new LinksCrawler( $mock_url );
+		$crawler = new LinksCrawler( $html );
 		$result  = $crawler->crawl();
 
 		$expected_result = [
@@ -153,18 +143,16 @@ final class LinksCrawlerTest extends TestCase {
 	public function test_crawl_with_no_domain_links() : void {
 		$mock_url = 'http://example.com';
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<a href="/link-1">Link 1</a>
 					<a href="#test-2">Link 2</a>
 				</body>
-			</html>'
-		);
+			</html>';
+		$this->mock_default_procedural_functions( $mock_url );
 
-		$crawler = new LinksCrawler( $mock_url );
+		$crawler = new LinksCrawler( $html );
 		$result  = $crawler->crawl();
 
 		$expected_result = [
@@ -177,18 +165,16 @@ final class LinksCrawlerTest extends TestCase {
 	public function test_crawl_with_repeated_links() : void {
 		$mock_url = 'http://example.com';
 
-		$this->mock_default_procedural_functions(
-			$mock_url,
-			'<!DOCTYPE html>
+		$html = '<!DOCTYPE html>
 			<html>
 				<body>
 					<a href="/link-1">Link 1</a>
 					<a href="http://example.com/link-1">Link 2</a>
 				</body>
-			</html>'
-		);
+			</html>';
+		$this->mock_default_procedural_functions( $mock_url );
 
-		$crawler = new LinksCrawler( $mock_url );
+		$crawler = new LinksCrawler( $html );
 		$result  = $crawler->crawl();
 
 		$expected_result = [
@@ -197,27 +183,7 @@ final class LinksCrawlerTest extends TestCase {
 		$this->assertEquals( $expected_result, $result );
 	}
 
-	private function mock_default_procedural_functions( $mock_url, $response_body ) : void {
-		$expected_response = [
-			'body'     => $response_body,
-			'response' => [ 'code' => 200 ],
-		];
-
-		Functions\expect( 'wp_remote_get' )
-			->once()
-			->with( $mock_url )
-			->andReturn( $expected_response );
-
-		Functions\expect( 'wp_remote_retrieve_body' )
-			->once()
-			->with( $expected_response )
-			->andReturn( $response_body );
-
-		Functions\expect( 'wp_remote_retrieve_response_code' )
-			->once()
-			->with( $expected_response )
-			->andReturn( 200 );
-
+	private function mock_default_procedural_functions( $mock_url ) : void {
 		Functions\expect( 'wp_parse_url' )
 			->andReturnUsing(
 				function( $url ) {

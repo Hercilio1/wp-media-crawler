@@ -7,13 +7,12 @@
 
 namespace WP_Media\Crawler\Custom\Crawlers;
 
-use Exception;
-use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
+use WP_Media\Crawler\Exceptions\WebpageException;
 
 /**
- * Class AbstractCrawler. Abstraction of any crawler.
+ * Class WebpageReader. Reads the return a webpage content.
  */
-abstract class AbstractCrawler {
+class WebpageReader {
 
 	/**
 	 * Web page url
@@ -32,13 +31,6 @@ abstract class AbstractCrawler {
 	}
 
 	/**
-	 * Abstract method 'crawl'. All crawlers should crawl.
-	 *
-	 * @return array The crawled data.
-	 */
-	abstract public function crawl() : array;
-
-	/**
 	 * Get the web page content
 	 *
 	 * @return string The web page content.
@@ -46,7 +38,7 @@ abstract class AbstractCrawler {
 	 * @throws WebpageException If the page request returns an error.
 	 * @throws WebpageException If the response body is empty.
 	 */
-	public function get_the_webpage_content() : string {
+	public function get_content() : string {
 		$response = wp_remote_get( $this->url );
 
 		if ( is_wp_error( $response ) ) {

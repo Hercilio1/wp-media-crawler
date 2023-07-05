@@ -8,27 +8,34 @@
 namespace WP_Media\Crawler\Custom\Crawlers;
 
 use \Symfony\Component\DomCrawler\Crawler;
-use WP_Media\Crawler\Custom\Crawlers\Exceptions\WebpageException;
+use WP_Media\Crawler\Exceptions\CrawlerException;
 use WP_Media\Crawler\Schemas\Link;
 
 /**
  * Class LinksCrawler. Crawls the links of a Web page.
  */
-final class LinksCrawler extends AbstractCrawler {
+final class LinksCrawler implements ICrawler {
+
+	/**
+	 * The web content to crawl
+	 *
+	 * @var string $html
+	 */
+	private $html;
 
 	/**
 	 * The links list
 	 *
 	 * @var Link[] $links
 	 */
-	private $links = [];
+	private $links;
 
 	/**
 	 * The links set
 	 *
 	 * @var array $links_set
 	 */
-	private $links_set = [];
+	private $links_set;
 
 	/**
 	 * Internal domain.
@@ -38,16 +45,26 @@ final class LinksCrawler extends AbstractCrawler {
 	private $internal_domain;
 
 	/**
+	 * Constructor method.
+	 *
+	 * @param string $html - The web content to crawl.
+	 */
+	public function __construct( $html ) {
+		$this->html      = $html;
+		$this->links     = [];
+		$this->links_set = [];
+	}
+
+	/**
 	 * Crawls the links of a Webpage.
 	 *
-	 * @return array The links found.
+	 * @return Link[] The links found.
 	 *
-	 * @throws WebpageException If the page doesn't have any link.
+	 * @throws CrawlerException If the page doesn't have any link.
 	 */
 	public function crawl() : array {
-		$html = $this->get_the_webpage_content();
-		if ( $html ) {
-			$crawler = new Crawler( $html );
+		if ( ! empty( $this->html ) ) {
+			$crawler = new Crawler( $this->html );
 			$crawler->filterXPath( '//a' )->each(
 				function( Crawler $node ) {
 					$this->add_link( $node );
@@ -55,7 +72,7 @@ final class LinksCrawler extends AbstractCrawler {
 			);
 		}
 		if ( empty( $this->links ) ) {
-			throw new WebpageException( __( 'The page doesn\'t have any internal link.', 'wp-media-crawler' ), $this->url );
+			throw new CrawlerException( __( 'The page doesn\'t have any internal link.', 'wp-media-crawler' ) );
 		}
 		return $this->links;
 	}
