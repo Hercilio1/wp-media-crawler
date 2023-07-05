@@ -6,7 +6,7 @@ After searching for the best solutions for crawling links using PHP/WordPress, I
 
 ## Where to save the sitemap.html
 
-First I thought about saving the sitemap.html file in the WP root through the ABSPATH constant. But I felt like there were better approaches than this. So I decided to look at some solutions made by some big guys. I used Yoast as a reference, storing the sitemap.html in a safer place, the wp-content/uploads folder, and serving it through PHP using rewrite rules (as Yoast does with the sitemap.xml).
+First I thought about saving the sitemap.html file in the WP root through the ABSPATH constant or maybe saving it in the wp-content/uploads folders. But I felt like there were better approaches than these. So I decided to look up for some solutions made by some big guys. Using Yoast as a reference, I decided to build the sitemap.html in runtime and to serve it through PHP using rewrite rules (as Yoast does with the sitemap.xml). This solution is more secure, easier to test and much simpler.
 
 ## Package template changes
 

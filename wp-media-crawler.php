@@ -20,6 +20,10 @@ if ( ! defined( 'WP_MEDIA_CRAWLER_VERSION' ) ) {
 	define( 'WP_MEDIA_CRAWLER_VERSION', '0.1.0' );
 }
 
+if ( ! defined( 'WP_MEDIA_CRAWLER_FILE' ) ) {
+	define( 'WP_MEDIA_CRAWLER_FILE', __FILE__ );
+}
+
 if ( ! defined( 'WP_MEDIA_CRAWLER_PATH' ) ) {
 	define( 'WP_MEDIA_CRAWLER_PATH', plugin_dir_path( __FILE__ ) );
 }
