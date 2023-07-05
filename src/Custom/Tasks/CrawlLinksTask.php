@@ -9,6 +9,8 @@ namespace WP_Media\Crawler\Custom\Tasks;
 
 use Exception;
 use WP_Media\Crawler\Custom\Crawlers\LinksCrawler;
+use WP_Media\Crawler\Custom\Crawlers\WebpageReader;
+use WP_Media\Crawler\Custom\Filesystem\File;
 use WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage;
 
 /**
@@ -21,8 +23,19 @@ class CrawlLinksTask extends AbstractTask {
 	 */
 	public function run() : void {
 		try {
-			$links = ( new LinksCrawler( home_url() ) )->crawl();
-			SitemapLinksStorage::store( $links );
+			$home_file = new File( 'home.html' );
+
+			SitemapLinksStorage::delete();
+			$home_file->delete();
+
+			$page_reader      = new WebpageReader( home_url() );
+			$response_content = $page_reader->get_content();
+
+			$link_crawler = new LinksCrawler( $response_content );
+			SitemapLinksStorage::store( $link_crawler->crawl() );
+
+			// Custom step: Save the home page’s .php file as a .html file.
+			$home_file->save( $response_content );
 		} catch ( Exception $e ) {
 			// TODO: Add a proper error logging.
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
