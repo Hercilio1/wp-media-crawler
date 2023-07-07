@@ -1,3 +1,3 @@
 /vendor/*
 /tests/env/local/
-/tests/Unit/.phpunit.result.cache
+*/**/.phpunit.result.cache

@@ -28,7 +28,6 @@ list(
 		<?php settings_errors( 'wp-media-crawler-sitemap-manager' ); ?>
 	</form>
 
-	// TODO: Add overview of the cronjob.
 	<hr>
 
 	<h2><?php esc_html_e( 'Overview:', 'wp-media-crawler' ); ?></h2>

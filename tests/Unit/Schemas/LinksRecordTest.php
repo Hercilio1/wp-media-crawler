@@ -13,7 +13,6 @@ namespace WP_Media\Crawler\Tests\Unit\Schemas;
 
 use Brain\Monkey\Functions;
 use \PHPUnit\Framework\TestCase;
-use WP_Media\Crawler\Custom\Sitemap\SitemapBuilder;
 use WP_Media\Crawler\Schemas\Link;
 use WP_Media\Crawler\Schemas\LinksRecord;
 

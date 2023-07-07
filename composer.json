@@ -42,7 +42,7 @@
 	},
 	"scripts": {
 		"test-unit": "\"vendor/bin/phpunit\" --testsuite unit --colors=always --configuration tests/Unit/phpunit.xml.dist",
-		"test-integration": "\"vendor/bin/wpmedia-phpunit\" integration path=Tests/Integration/",
+		"test-integration": "\"vendor/bin/phpunit\" --testsuite integration --colors=always --configuration tests/Integration/phpunit.xml.dist",
 		"test-coverage": "\"vendor/bin/phpunit\" --testsuite unit --colors=always --coverage-text --configuration tests/Unit/phpunit.xml.dist",
 		"run-tests": [
 			"@test-unit",
