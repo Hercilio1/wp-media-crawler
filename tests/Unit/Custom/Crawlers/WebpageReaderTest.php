@@ -73,7 +73,6 @@ final class WebpageReaderTest extends TestCase {
 		$crawler->get_content();
 	}
 
-
 	public function test_response_body_exception() : void {
 		$mock_url      = 'http://example.com';
 		$error_msg     = 'The page\'s body is malformed.';
@@ -88,7 +87,7 @@ final class WebpageReaderTest extends TestCase {
 
 		Functions\expect( 'wp_remote_retrieve_response_code' )
 			->with( $response_body )
-			->andReturn( 404 );
+			->andReturn( 200 );
 
 		Functions\expect( 'wp_remote_retrieve_body' )
 			->with( [] )
@@ -100,6 +99,31 @@ final class WebpageReaderTest extends TestCase {
 
 		$crawler = new WebpageReader( $mock_url );
 		$crawler->get_content();
+	}
+
+	public function test_response_200_and_with_filled_body() : void {
+		$mock_url      = 'http://example.com';
+		$response_body = [
+			'response' => [ 'code' => 200 ],
+			'body'     => '<html></html>',
+		];
+
+		Functions\expect( 'wp_remote_get' )
+			->with( $mock_url )
+			->andReturn( $response_body );
+
+		Functions\expect( 'wp_remote_retrieve_response_code' )
+			->with( $response_body )
+			->andReturn( 200 );
+
+		Functions\expect( 'wp_remote_retrieve_body' )
+			->with( [] )
+			->andReturn( '<html></html>' );
+
+		$crawler = new WebpageReader( $mock_url );
+		$result  = $crawler->get_content();
+
+		$this->assertEquals( '<html></html>', $result );
 	}
 
 	protected function tearDown() : void {

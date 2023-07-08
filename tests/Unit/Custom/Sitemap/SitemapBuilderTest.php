@@ -18,7 +18,7 @@ use WP_Media\Crawler\Schemas\Link;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Sitemap\SitemapBuilder
- * @group Crawlers
+ * @group Sitemap
  */
 final class SitemapBuilderTest extends TestCase {
 

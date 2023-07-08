@@ -19,7 +19,7 @@ use WP_Media\Crawler\Schemas\LinksRecord;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage
- * @group Crawlers
+ * @group Sitemap
  */
 final class SitemapLinksStorageTest extends TestCase {
 

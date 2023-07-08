@@ -29,7 +29,7 @@ final class OptionsPage {
 			'tools.php',
 			__( 'WP Media | Sitemap Manager', 'wp-media-crawler' ),
 			__( 'WP Media Sitemap', 'wp-media-crawler' ),
-			'manage_options',
+			'administrator',
 			'wp-media-crawler-sitemap-manager',
 			[ __CLASS__, 'render_options_page' ]
 		);

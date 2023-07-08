@@ -13,12 +13,11 @@ namespace WP_Media\Crawler\Tests\Unit\Custom\Sitemap;
 
 use Brain\Monkey\Functions;
 use \PHPUnit\Framework\TestCase;
-use WP_Media\Crawler\Custom\Tasks\AbstractTask;
 use WP_Media\Crawler\Custom\Tasks\CrawlLinksTask;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Tasks\AbstractTask
- * @group Crawlers
+ * @group Tasks
  */
 final class AbstractTaskTest extends TestCase {
 

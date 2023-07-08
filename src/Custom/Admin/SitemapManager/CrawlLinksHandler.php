@@ -31,11 +31,14 @@ class CrawlLinksHandler {
 	 * Handle the crawl sitemap links request.
 	 */
 	public static function handle_crawl_sitemap_links() : void {
-		check_ajax_referer( 'wp_media_crawler_crawl_sitemap_links' );
+		check_admin_referer( 'wp_media_crawler_crawl_sitemap_links' );
 
 		if ( ! current_user_can( 'administrator' ) ) {
 			wp_safe_redirect( wp_get_referer() );
-			die();
+			wp_die(
+				esc_html__( 'You are not allowed to crawl the sitemap links.', 'wp-media-crawler' ),
+				esc_html__( 'Permission Error', 'wp-media-crawler' )
+			);
 		}
 
 		try {
@@ -61,7 +64,7 @@ class CrawlLinksHandler {
 		}
 
 		wp_safe_redirect( wp_get_referer() );
-		die();
+		wp_die();
 	}
 
 	/**

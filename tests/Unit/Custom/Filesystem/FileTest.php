@@ -18,7 +18,7 @@ use WP_Media\Crawler\Tests\Unit\FilesystemTestCase;
 
 /**
  * @covers \WP_Media\Crawler\Custom\Filesystem\File
- * @group Crawlers
+ * @group Filesystem
  */
 final class FileTest extends FilesystemTestCase {
 
