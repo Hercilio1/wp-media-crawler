@@ -1,22 +1,35 @@
 # WP Media Crawler
 
-Dev: [![Build Status](https://app.travis-ci.com/Hercilio1/wp-media-crawler.svg?branch=dev)](https://app.travis-ci.com/Hercilio1/wp-media-crawler)
-
 Master: [![Build Status](https://app.travis-ci.com/Hercilio1/wp-media-crawler.svg?branch=master)](https://app.travis-ci.com/Hercilio1/wp-media-crawler)
 
-Repository template for our packages
+Dev: [![Build Status](https://app.travis-ci.com/Hercilio1/wp-media-crawler.svg?branch=dev)](https://app.travis-ci.com/Hercilio1/wp-media-crawler)
 
-# Usage
-When creating a new repository for a package or a plugin, select this repository as the template. It will initialize the new repository with all the structure & files contained in the template.
+## Installing locally
 
+This is a plugin WordPress, so you need to clone this repo into the WordPress plugins folder, enter the folder and run the following commands:
+```
+$ composer install
+```
 
-# Content
-* `bin/install-wp-tests.sh`: installer for WordPress tests suite
-* `.editorconfig`: config file for your IDE to follow our coding standards
-* `.gitattributes`: list of directories & files excluded from export
-* `.gitignore`: list of directories & files excluded from versioning
-* `.travis.yml`: Travis-CI configuration file
-* `composer.json`: Base composer file to customize for the project
-* `LICENSE`: License file using GPLv3
-* `phpcs.xml`: Base PHP Code Sniffer configuration file to customize for the project
-* `README.md`: The readme displayed on Github, to customize for the project
+After that, you just need to activate the plugin in the WordPress Admin.
+
+## Installing online
+
+First, follow the [installing locally guide](#markdown-header-installing-locally). Then, you will need to use a system based on Unix (MacOS, Linux, Windows WSL) to follow the next steps.
+
+1. Install WP CLI and [WP CLI Dist Archive](https://developer.wordpress.org/cli/commands/dist-archive/).
+
+2. Run the following command. It will generate a .zip in the previous folder (outside the plugin repo folder) with the name of the plugin. Use it to install the plugin into WordPress through the [Admin page](https://wordpress.org/documentation/article/manage-plugins/#upload-via-wordpress-admin).
+	```
+	$ composer build
+	```
+
+## Usage
+
+The plugin will automatically run and schedule a task for crawling the home page links and create a sitemap.html. You can access it in 2 ways.
+
+1. Public access. Just access your website DNS with the following path: `/sitemap.html`. If you get a 404 error, try the next step to make sure there are no errors.
+
+2. Admin access. Through the submenu under the "Tools" menu (as shown below), you can see the sitemap table or run the crawler task manually.
+
+	![Tools submenu](./doc/wp-media-crawler-submenu.png)
