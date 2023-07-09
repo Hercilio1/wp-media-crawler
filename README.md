@@ -1,4 +1,9 @@
-# Package Template
+# WP Media Crawler
+
+[![Build Status](https://app.travis-ci.com/Hercilio1/wp-media-crawler.svg?branch=dev)](https://app.travis-ci.com/Hercilio1/wp-media-crawler)
+
+[![Build Status](https://app.travis-ci.com/Hercilio1/wp-media-crawler.svg?branch=master)](https://app.travis-ci.com/Hercilio1/wp-media-crawler)
+
 Repository template for our packages
 
 # Usage
