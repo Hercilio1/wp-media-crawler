@@ -1,0 +1,9 @@
+{
+  // PHP settings
+  "phpSniffer.standard": "./phpcs.xml.dist",
+  "phpSniffer.autoDetect": true,
+  "[php]": {
+    "editor.defaultFormatter": "wongjn.php-sniffer",
+    "editor.formatOnSave": true
+  },
+}
