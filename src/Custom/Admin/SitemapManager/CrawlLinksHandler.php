@@ -63,8 +63,7 @@ class CrawlLinksHandler {
 			self::handle_error( 'The following ocurred while crawling the links: ' . $e->getMessage() );
 		}
 
-		wp_safe_redirect( wp_get_referer() );
-		wp_die();
+		self::redirect();
 	}
 
 	/**
@@ -72,7 +71,7 @@ class CrawlLinksHandler {
 	 *
 	 * @param string $message Error message.
 	 */
-	private static function handle_error( $message ) : void {
+	protected static function handle_error( $message ) : void {
 		$output  = '<p><b>' . esc_html__( 'Error while crawling the sitemap links.', 'wp-media-crawler' ) . '</b></p>';
 		$output .= $message;
 		wp_die(
@@ -83,5 +82,15 @@ class CrawlLinksHandler {
 				'back_link' => true,
 			]
 		);
+	}
+
+	/**
+	 * Handle the request redirect
+	 */
+	protected static function redirect() : void {
+		if ( wp_safe_redirect( wp_get_referer() ) ) {
+			die();
+		}
+		wp_die( 'Links crawled successfully.' );
 	}
 }

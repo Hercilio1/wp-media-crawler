@@ -9,7 +9,7 @@
  * Domain Path:         /languages
  * Version:             0.1.0
  * Requires at least:   5.0
- * Requires PHP:        7.4
+ * Requires PHP:        7.2
  *
  * @package WP_Media_Crawler
  */
