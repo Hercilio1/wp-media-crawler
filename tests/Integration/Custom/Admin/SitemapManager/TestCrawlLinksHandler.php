@@ -12,7 +12,7 @@
  * @phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
  */
 
-namespace WP_Media\Crawler\Tests\Integration;
+namespace WP_Media\Crawler\Tests\Integration\Custom\Admin\SitemapManager;
 
 use Brain\Monkey\Functions;
 use WP_Media\Crawler\Custom\Filesystem\File;
@@ -21,7 +21,11 @@ use WPDieException;
 use WPMedia\PHPUnit\Integration\TestCase;
 
 /**
- * @covers
+ * @covers WP_Media\Crawler\Custom\Admin\SitemapManager\CrawlLinksHandler
+ * @covers WP_Media\Crawler\Custom\Crawlers\WebpageReader
+ * @covers WP_Media\Crawler\Custom\Crawlers\LinksCrawler
+ * @covers WP_Media\Crawler\Custom\Filesystem\File
+ * @covers WP_Media\Crawler\Custom\Sitemap\SitemapLinksStorage
  *
  * @group Admin
  */
@@ -59,7 +63,7 @@ class TestCrawlLinksHandler extends TestCase {
 		do_action( 'admin_post_wp_media_crawler_crawl_sitemap_links' );
 	}
 
-	public function test_action_failed_because_of_remote_request_exception() : void {
+	public function test_action_fails_because_of_remote_request_exception() : void {
 		$this->user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		wp_set_current_user( $this->user_id );
 
@@ -77,7 +81,7 @@ class TestCrawlLinksHandler extends TestCase {
 		do_action( 'admin_post_wp_media_crawler_crawl_sitemap_links' );
 	}
 
-	public function test_action_failed_because_there_are_no_internal_links() : void {
+	public function test_action_fails_because_there_are_no_internal_links() : void {
 		$this->user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		wp_set_current_user( $this->user_id );
 
@@ -100,7 +104,7 @@ class TestCrawlLinksHandler extends TestCase {
 		do_action( 'admin_post_wp_media_crawler_crawl_sitemap_links' );
 	}
 
-	public function test_action_failed_by_generic_error() : void {
+	public function test_action_fails_by_generic_error() : void {
 		$this->user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		wp_set_current_user( $this->user_id );
 

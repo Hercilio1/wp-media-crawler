@@ -1,21 +1,19 @@
 # Integration Test Cases
 
-## General
+## General [x]
 
 1. Activation without fatal errors
 
-## Admin
+## Admin [x]
 
-1. Crawl and store the home page links
-2. Catch exceptions
+1. Test Crawl and store the home page links
+2. Test Catch exceptions
 
-## Sitemap.html
+## Sitemap.html [x]
 
-1. Test rewrite rules
-2. Test .html generator from stored links
+1. Test .html generator from stored links
 
-## Cronjob
+## Cronjob [x]
 
-1. Test activation flow
-2. Test cronjob execution
-3. Test Catch exceptions
+1. Test cronjob execution
+2. Test Catch exceptions

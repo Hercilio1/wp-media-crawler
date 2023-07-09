@@ -4,7 +4,8 @@
  *
  * @package WP_Media_Crawler
  *
- * @phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
+ * @phpcs:disable Generic.Commenting.DocComment
+ * @phpcs:disable Squiz.Commenting.FunctionComment
  */
 
 namespace WP_Media\Crawler\Tests\Integration;
@@ -12,9 +13,6 @@ namespace WP_Media\Crawler\Tests\Integration;
 use Yoast\WPTestUtils\WPIntegration\TestCase;
 
 /**
- * @covers
- *
- * @group Admin_Only
  * @group Activation
  */
 class TestPluginActivation extends TestCase {

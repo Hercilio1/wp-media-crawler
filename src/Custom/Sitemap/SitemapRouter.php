@@ -12,14 +12,16 @@ namespace WP_Media\Crawler\Custom\Sitemap;
  *
  * Based on Yoast sitemaps router.
  */
-final class SitemapRouter {
+class SitemapRouter {
 
 	/**
 	 * Init method.
 	 */
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'add_rewrite_rule' ], 1 );
-		add_action( 'pre_get_posts', [ __CLASS__, 'redirect' ], 1 );
+		// Even though in the current context a static class would fit, I used an object so I could
+		// properly test it (integration tests).
+		add_action( 'pre_get_posts', [ new self(), 'redirect' ], 1 );
 	}
 
 	/**
@@ -38,7 +40,7 @@ final class SitemapRouter {
 	 *
 	 * @param \WP_Query $query The WP_Query instance.
 	 */
-	public static function redirect( $query ) : void {
+	public function redirect( $query ) : void {
 		if ( ! $query->is_main_query() ) {
 			return;
 		}
@@ -60,19 +62,19 @@ final class SitemapRouter {
 			return;
 		}
 
-		self::sitemap_open();
+		$this->sitemap_open();
 
 		$sitemap_builder = new SitemapBuilder( $sitemap_links->links );
 
 		echo $sitemap_builder->build(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-		self::sitemap_close();
+		$this->sitemap_close();
 	}
 
 	/**
 	 * Sitemap open
 	 */
-	private static function sitemap_open() : void {
+	protected function sitemap_open() : void {
 		if ( headers_sent() ) {
 			return;
 		}
@@ -101,7 +103,7 @@ final class SitemapRouter {
 	/**
 	 * Sitemap close
 	 */
-	private static function sitemap_close() : void {
+	protected function sitemap_close() : void {
 		remove_all_actions( 'wp_footer' );
 		die();
 	}

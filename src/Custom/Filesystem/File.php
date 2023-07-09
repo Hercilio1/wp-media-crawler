@@ -64,6 +64,9 @@ final class File {
 	 * @codeCoverageIgnore
 	 */
 	private function load_wp_default_filesystem() : WP_Filesystem_Direct {
+		if ( ! is_admin() && wp_doing_cron() ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
 		if ( ! function_exists( '\\WP_Filesystem' ) ) {
 			throw new RuntimeException( 'WP_Filesystem not found.' );
 		}

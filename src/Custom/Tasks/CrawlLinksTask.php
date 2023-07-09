@@ -22,6 +22,9 @@ class CrawlLinksTask extends AbstractTask {
 	 * The task runner.
 	 */
 	public function run() : void {
+		if ( ! wp_doing_cron() ) {
+			return;
+		}
 		try {
 			$home_file = new File( 'home.html' );
 
