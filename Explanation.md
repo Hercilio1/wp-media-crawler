@@ -2,13 +2,13 @@
 
 ## The problem to be solved
 
-From a business-related point of view, the problem is to have a way for analyzing the website (for this test only the home page) backlinks health. Based on the links overview, the site administrator could find ways for improving their WebSite SEO and increase page views.
+From a business-related point of view, the problem is to have a way for analyzing the website backlinks health (for this test only the home page). Based on the links overview, the site administrator could find ways for improving their WebSite SEO and increase page views.
 
 From an engineering point of view, the problem is related to making sure the administrator will have a good experience while analyzing the page's links. It is also important to make sure the admin analyses the current links, so it has to be up to date. Furthermore, it could use the power of programming languages to filter and delivers the links that are most important for the analysis.
 
 ## A technical spec of how I will solve it
 
-Thinking about WordPress and all the tools and package this framework have, the best approach would be to develop a plugin. Regarding the technical requirements, for the first step, I will develop a PoC (proof of concept) to make sure I choose the best crawler engine. This is the only part I'm not sure about what is the best approach. 
+Thinking about WordPress and all the tools and packages this framework has, the best approach would be to develop a plugin. Regarding the technical requirements, for the first step, I will develop a PoC (proof of concept) to make sure I choose the best crawler engine. This is the only part I'm not sure about what is the best approach. 
 
 After choosing that, I will probably build the final structure for the engine and then develop the whole plugin around it. I usually use OOP to build and test each part of the system separately, and then connect everything afterward (connecting everything and seeing it working is pretty much one of the most satisfactory feelings about Software Engineering).
 
@@ -16,11 +16,11 @@ After choosing that, I will probably build the final structure for the engine an
 
 As I planned, I started with a PoC of the crawler engine. After that, I built everything around it. Using DDD (Domain Driven Development), I tried to split every "context" in a package and then just execute it from a procedural initializer (such as cron job tasks or the admin handler). 
 
-Prematurely, I created the repository when I was doing the PoC, so I named it after it. I kept it so I could save some time, as it was one of the objectives of the technical assignment. As a software engineer, I know the importance of good names. Now, thinking also about the WP Media products, I would name it WP Media SEO, as a sparkle for something great.
+Prematurely, I created the repository when I was doing the PoC, so I named it after it. I decided to keep it. As a software engineer, I know the importance of good names. Alternatively, thinking about the WP Media products, I would name it "WP Media SEO", as a sparkle for something great.
 
 ### The crawler engine
 
-After searching for the best solutions for crawling links using PHP/WordPress, I chose to use the [Symfony Crawler](https://github.com/symfony/dom-crawler). This lib is by far the most popular and very straightforward. I also could use the native PHP DomDocument class to crawl, but I have some experience with this guy and if I can avoid handling its limitations and weirdness, I go for it.
+After searching for the best solutions for crawling links using PHP/WordPress, I chose to use the [Symfony Crawler](https://github.com/symfony/dom-crawler). This lib is by far the most popular and it is very straightforward. I also could use the native PHP DomDocument class to crawl, but I have some experience with this guy and if I can avoid handling its limitations and weirdness, I go for it.
 
 ### Where to save the sitemap.html
 
@@ -47,7 +47,7 @@ So in order to pass the Travis builds, I disabled the PHP 7.2 verification.
 
 ### General overview (about technical decisions)
 
-The rest of the structure is based on my general past experiences and I believe it can get more and more sharpen.
+The rest of the structure is based on my general past experiences.
 
 ## How the code itself works and why
 
@@ -66,7 +66,7 @@ The rest of the structure is covered below.
 
 It is responsible for downloading the webpage and searching for internal links. It was built thinking about scaling with other crawlers, so I created an interface.
 
-The WebpageReader was moved from the Crawler interface so we could use the HTML content of the request page for other actions besides crawling.
+The WebpageReader was removed from the Crawler interface so I could use the HTML content of the request page for other actions besides crawling.
 
 The LinksCrawler will return all internal links inside the requested webpage.
 
